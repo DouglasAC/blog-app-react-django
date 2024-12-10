@@ -6,7 +6,7 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/posts/?format=json")
+        axios.get("http://localhost:8000/api/posts/")
         .then((response) => {
             setPosts(response.data);
         })
