@@ -9,6 +9,7 @@ const PostList = () => {
 
     const fetchPost = async () => {
         setLoading(true);
+        console.log("Page", page);
         try {
             const response = await axios.get(`http://localhost:8000/api/posts/published/?page=${page}`);
             console.log("Posts", response.data);

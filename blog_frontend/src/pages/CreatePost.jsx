@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 const CreatePost = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [status, setStatus] = useState("draft");
+    const [status, setStatus] = useState("0");
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,15 +24,17 @@ const CreatePost = () => {
                 }
             );
             console.log("Publicación creada:", response.data);
-            navigate("/posts"); // Redirigir a la lista de publicaciones
+            navigate("/manage-posts"); // Redirigir a la lista de publicaciones
         } catch (error) {
             console.error("Error al crear la publicación:", error);
+            setError("Error al crear la publicación.");
         }
     };
 
     return (
         <div className="container mt-5">
             <h1 className="text-center text-primary">Crear Publicación</h1>
+            {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="title" className="form-label">Título</label>
