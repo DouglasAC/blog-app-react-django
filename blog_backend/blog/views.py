@@ -96,3 +96,21 @@ class CreatePostView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+class UpdatePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id, user=request.user)
+        except Post.DoesNotExist:
+            return Response({
+                'error': 'No se encontró el post'
+            }, status=404)
+        
+        serializer = PostSerializer(post, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+            

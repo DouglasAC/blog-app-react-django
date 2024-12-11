@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/posts/published/', views.PostPublishAPIView.as_view(), name='published-post-list'),
     path('api/register/', views.RegisterView.as_view(), name='register'),
     path('api/create-post/', views.CreatePostView.as_view(), name='create-post'),
+    path('api/update-post/<int:post_id>/', views.UpdatePostView.as_view(), name='update-post'),
 ]
