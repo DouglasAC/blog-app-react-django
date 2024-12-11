@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 
 const PostDetail = () => {
@@ -7,25 +7,38 @@ const PostDetail = () => {
     const [post, setPost] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:8000/api/posts/${id}`)
-        .then((response) => {
-            setPost(response.data);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+        const fetchPost = async () => {
+            try{
+                const response = await axios.get(`http://localhost:8000/api/posts/${id}`)
+                setPost(response.data);
+                console.log("Post", response.data);
+            }catch(error){
+                console.error("Error al cargar la publicación", error);
+            }
+        };
+        fetchPost();
     }, [id]);
 
     return (
-        <div>
-            {post ? (
-                <>
-                <h1>{post.title}</h1>
-                <p>{post.content}</p>
-                </>
-            ) : (
-                <p>Cargando...</p>
-            )}
+        <div className="container mt-5">
+            <div className="card">
+                <div className="card-body">
+                    {post ? (
+                        <>
+                            <h1 className="card-title">{post.title}</h1>
+                            <p className="card-text text-muted">Publicado por {post.user.username} el {new Date(post.created_at).toLocaleDateString()}</p>
+                            <hr />
+                            <p className="card-text">{post.content}</p>
+
+                            <Link to="/posts" className="btn btn-secondary mt-3">Volver</Link>
+                        </>
+                    ) : (
+                        <p>Cargando publicación...</p>
+                    )}
+
+                </div>
+
+            </div>
         </div>
     );
 };
