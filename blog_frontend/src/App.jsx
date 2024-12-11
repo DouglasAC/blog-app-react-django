@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import PostList from "./pages/PostList";
 import PostDetail from "./pages/PostDetail";
 import Register from "./pages/Register";
+import Login from "./pages/Loging";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/posts" element={<PostList />} />
         <Route path="/posts/:id" element={<PostDetail />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
