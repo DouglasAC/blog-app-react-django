@@ -5,10 +5,13 @@ import PostList from "./pages/PostList";
 import PostDetail from "./pages/PostDetail";
 import Register from "./pages/Register";
 import Login from "./pages/Loging";
+import Navbar from "./components/NavBarr";
 
 const App = () => {
   return (
+    
     <Router>
+      <Navbar/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<PostList />} />
