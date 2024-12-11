@@ -6,6 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from .models import Post
 from .serializers import PostSerializer
 from .serializers import UserSerializer
+from .serializers import RegisterSerializer
 
 # Create your views here.
 
@@ -66,3 +67,11 @@ class PostPublishAPIView(APIView):
         paginated_posts = paginator.paginate_queryset(post, request)
         serealizer = PostSerializer(paginated_posts, many=True)
         return Response(serealizer.data)
+    
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
