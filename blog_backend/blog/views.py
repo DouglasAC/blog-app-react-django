@@ -42,6 +42,8 @@ class PostListAPIView(APIView):
         return Response(serializer.errors, status=400)
     
 class PostDetailAPIView(APIView):
+    authentication_classes = []  # Permitir acceso sin autenticación
+    permission_classes = [] # Permitir acceso sin permisos
     def get(self, request, pk):
         post = Post.objects.get(pk=pk)
         serializer = PostSerializer(post)
@@ -63,7 +65,7 @@ class PostDetailAPIView(APIView):
 class PostPublishAPIView(APIView):
     authentication_classes = []  # Permitir acceso sin autenticación
     permission_classes = [] # Permitir acceso sin permisos
-    
+
     def get(self, request, *args, **kwargs):
         post = Post.objects.filter(status=1)
         paginator = CustomPagination()
