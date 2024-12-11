@@ -6,6 +6,7 @@ import PostDetail from "./pages/PostDetail";
 import Register from "./pages/Register";
 import Login from "./pages/Loging";
 import Navbar from "./components/NavBarr";
+import CreatePost from "./pages/CreatePost";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/posts/:id" element={<PostDetail />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/create-post" element={<CreatePost />} />
       </Routes>
     </Router>
   );

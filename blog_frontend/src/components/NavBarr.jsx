@@ -43,6 +43,13 @@ const Navbar = () => {
                                 Publicaciones
                             </Link>
                         </li>
+                        {isAuthenticated && (
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/create-post">
+                                    Crear Publicación
+                                </Link>
+                            </li>
+                        )}
                         {isAuthenticated ? (
                             <>
                                 <li className="nav-item">

@@ -68,7 +68,7 @@ class PostPublishAPIView(APIView):
     permission_classes = [] # Permitir acceso sin permisos
 
     def get(self, request, *args, **kwargs):
-        post = Post.objects.filter(status=1)
+        post = Post.objects.filter(status=1).order_by('-created_at')
         paginator = CustomPagination()
         paginated_posts = paginator.paginate_queryset(post, request)
         serealizer = PostSerializer(paginated_posts, many=True)
