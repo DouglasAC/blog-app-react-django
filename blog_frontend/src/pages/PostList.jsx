@@ -10,7 +10,7 @@ const PostList = () => {
     const fetchPost = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:8000/api/posts/?page=${page}`);
+            const response = await axios.get(`http://localhost:8000/api/posts/published/?page=${page}`);
             console.log("Posts", response.data);
             const data = response.data || [];
             setPosts((prevPosts) => {

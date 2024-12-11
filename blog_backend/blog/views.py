@@ -30,9 +30,7 @@ class CustomPagination(PageNumberPagination):
 class PostListAPIView(APIView):
     def get(self, request):
         posts = Post.objects.all()
-        paginator = CustomPagination()
-        paginated_posts = paginator.paginate_queryset(posts, request)
-        serializer = PostSerializer(paginated_posts, many=True)
+        serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
     
     def post(self, request):
@@ -60,3 +58,11 @@ class PostDetailAPIView(APIView):
         post = Post.objects.get(pk=pk)
         post.delete()
         return Response(status=204)
+    
+class PostPublishAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        post = Post.objects.filter(status=1)
+        paginator = CustomPagination()
+        paginated_posts = paginator.paginate_queryset(post, request)
+        serealizer = PostSerializer(paginated_posts, many=True)
+        return Response(serealizer.data)
