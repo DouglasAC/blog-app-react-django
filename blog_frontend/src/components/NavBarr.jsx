@@ -44,11 +44,18 @@ const Navbar = () => {
                             </Link>
                         </li>
                         {isAuthenticated && (
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/create-post">
-                                    Crear Publicación
-                                </Link>
-                            </li>
+                            <>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/create-post">
+                                        Crear Publicación
+                                    </Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/manage-posts">
+                                        Gestionar Publicaciones
+                                    </Link>
+                                </li>
+                            </>
                         )}
                         {isAuthenticated ? (
                             <>
