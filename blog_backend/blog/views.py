@@ -122,3 +122,16 @@ class UserPostListAPIView(APIView):
         serializer = PostSerializer(user_posts, many=True)
         return Response(serializer.data)
             
+class DeletePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id, user=request.user)
+        except Post.DoesNotExist:
+            return Response({
+                'error': 'No se encontró el post'
+            }, status=404)
+        
+        post.delete()
+        return Response(status=204)
