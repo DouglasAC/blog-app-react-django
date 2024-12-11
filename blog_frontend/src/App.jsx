@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Loging";
 import Navbar from "./components/NavBarr";
 import CreatePost from "./pages/CreatePost";
+import EditPost from "./pages/EditPost";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create-post" element={<CreatePost />} />
+        <Route path="/edit-post/:id" element={<EditPost />} />
       </Routes>
     </Router>
   );
