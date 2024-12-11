@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/register/', views.RegisterView.as_view(), name='register'),
     path('api/create-post/', views.CreatePostView.as_view(), name='create-post'),
     path('api/update-post/<int:post_id>/', views.UpdatePostView.as_view(), name='update-post'),
+    path('api/user-posts/', views.UserPostListAPIView.as_view(), name='user-post-list'),
 ]

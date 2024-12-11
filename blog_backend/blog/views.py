@@ -113,4 +113,12 @@ class UpdatePostView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+    
+class UserPostListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_posts = Post.objects.filter(user=request.user).order_by('-created_at')
+        serializer = PostSerializer(user_posts, many=True)
+        return Response(serializer.data)
             
