@@ -15,6 +15,13 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
+    def likes_count(self):
+        return self.like_set.count()
+    
+    def liked(self, user):
+        print(user)
+        return self.like_set.filter(user=user).exists()
+    
 class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

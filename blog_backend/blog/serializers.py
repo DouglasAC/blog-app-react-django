@@ -9,11 +9,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
 
+    def get_liked(self, obj):
+        request = self.context.get('request', None)
+        print(request.user.username)
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            return obj.liked(request.user)
+        return False
+    
+    def get_likes_count(self, obj):
+        return obj.likes_count()
+    
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['id', 'title', 'content', 'likes_count', 'liked', 'user', 'status']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

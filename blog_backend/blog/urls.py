@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/update-post/<int:post_id>/', views.UpdatePostView.as_view(), name='update-post'),
     path('api/user-posts/', views.UserPostListAPIView.as_view(), name='user-post-list'),
     path('api/delete-post/<int:post_id>/', views.DeletePostView.as_view(), name='delete-post'),
+    path('api/posts/<int:post_id>/like/', views.LikePostView.as_view(), name='like-post'),
 ]

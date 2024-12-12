@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Post, Like
 from .serializers import PostSerializer
 from .serializers import UserSerializer
@@ -32,7 +32,7 @@ class CustomPagination(PageNumberPagination):
 class PostListAPIView(APIView):
     def get(self, request):
         posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
+        serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
     
     def post(self, request):
@@ -64,10 +64,10 @@ class PostDetailAPIView(APIView):
         return Response(status=204)
     
 class PostPublishAPIView(APIView):
-    authentication_classes = []  # Permitir acceso sin autenticación
-    permission_classes = [] # Permitir acceso sin permisos
+    permission_classes = [] # Permitir acceso sin autenticación
 
     def get(self, request, *args, **kwargs):
+        print(f"Usuario autenticado: {request.user}")
         title = request.query_params.get('title', None)
         author = request.query_params.get('author', None)
         post = Post.objects.filter(status=1).order_by('-created_at')
@@ -77,7 +77,8 @@ class PostPublishAPIView(APIView):
             post = post.filter(user__username=author)
         paginator = CustomPagination()
         paginated_posts = paginator.paginate_queryset(post, request)
-        serealizer = PostSerializer(paginated_posts, many=True)
+        print(request.user)
+        serealizer = PostSerializer(paginated_posts, many=True, context={'request': request})
         return Response(serealizer.data)
     
 class RegisterView(APIView):
@@ -97,7 +98,8 @@ class CreatePostView(APIView):
     def post(self, request):
         data = request.data
         data['user'] = request.user.id
-        serializer = PostSerializer(data=data)
+        
+        serializer = PostSerializer(data=data,context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
@@ -125,7 +127,7 @@ class UserPostListAPIView(APIView):
 
     def get(self, request):
         user_posts = Post.objects.filter(user=request.user).order_by('-created_at')
-        serializer = PostSerializer(user_posts, many=True)
+        serializer = PostSerializer(user_posts, many=True, context={'request': request})
         return Response(serializer.data)
             
 class DeletePostView(APIView):
@@ -148,14 +150,15 @@ class LikePostView(APIView):
     def post(self, request, post_id):
         try:
             post = Post.objects.get(id=post_id)
+            like, created = Like.objects.get_or_create(post=post, user=request.user)
+            if not created:
+                like.delete()
+                return Response({"message": "Like eliminado", "likes_count": post.like_set.count(), "liked": False},status=204)
+        
+            return Response({"message": "Like agregado", "likes_count": post.like_set.count(), "liked": True}, status=201)
         except Post.DoesNotExist:
             return Response({
                 'error': 'No se encontró el post'
             }, status=404)
         
-        like, created = Like.objects.get_or_create(post=post, user=request.user)
-        if not created:
-            like.delete()
-            return Response(status=204)
         
-        return Response(status=201)

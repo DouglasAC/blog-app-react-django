@@ -11,14 +11,17 @@ const PostList = () => {
 
     const fetchPost = async (title = "", author = "") => {
         setLoading(true);
+        const accessToken = localStorage.getItem("accessToken");
         try {
             const response = await axios.get(`http://localhost:8000/api/posts/published/`, {
                 params: {
                     page: page,
                     title: title,
                     author: author
-                }
-            });
+                },
+                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+            }
+        );
             console.log("Posts", response.data);
             const data = response.data || [];
             setPosts((prevPosts) => {
@@ -51,16 +54,32 @@ const PostList = () => {
         return () => window.removeEventListener("scroll", handleNext);
     }, []);
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        fetchPost(searchTitle, searchAuthor);
+    };
+
+    const handleLike = async (postId) => {
+        try {
+            const accessToken = localStorage.getItem("accessToken");
+            const response = await axios.post(`http://localhost:8000/api/posts/${postId}/like/`,{},{
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            console.log("Like", response.data);
+            
+            fetchPost();
+        } catch (error) {
+            console.error("Error al dar like a la publicación", error);
+        }
+    };
+
     const truncateContent = (content, maxLength) => {
         if (content.length <= maxLength) {
             return content;
         }
         return content.substring(0, maxLength) + "...";
-    };
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        fetchPost(searchTitle, searchAuthor);
     };
 
     const filteredPosts = posts.filter((post) => {
@@ -82,8 +101,9 @@ const PostList = () => {
                                     <div className="card-body">
                                         <h5 className="card-title">{post.title}</h5>
                                         <p className="card-text">{truncateContent(post.content, 100)}</p>
-                                        <p className="card-text text-muted">Autor: {post.user.username}</p>
-                                        <Link to={`/posts/${post.id}`} className="btn btn-primary">Leer más</Link>
+                                        <p className="card-text text-muted">Autor: {post.user.username} | Me gustas: {post.likes_count}</p>
+                                        <button className={`btn ${post.liked ? 'btn-success' : 'btn-secondary'} me-2`} onClick={() => handleLike(post.id)}>{post.liked ? 'Te gusta' : 'Me gusta'}</button>
+                                        <Link to={`/posts/${post.id}`} className="btn btn-primary ml-2">Leer más</Link>
                                     </div>
                                 </div>
                             </div>
