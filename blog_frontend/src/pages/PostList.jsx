@@ -5,13 +5,20 @@ import { Link } from "react-router-dom";
 const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(1);
-    const [loaging, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [searchTitle, setSearchTitle] = useState("");
+    const [searchAuthor, setSearchAuthor] = useState("");
 
-    const fetchPost = async () => {
+    const fetchPost = async (title = "", author = "") => {
         setLoading(true);
-        console.log("Page", page);
         try {
-            const response = await axios.get(`http://localhost:8000/api/posts/published/?page=${page}`);
+            const response = await axios.get(`http://localhost:8000/api/posts/published/`, {
+                params: {
+                    page: page,
+                    title: title,
+                    author: author
+                }
+            });
             console.log("Posts", response.data);
             const data = response.data || [];
             setPosts((prevPosts) => {
@@ -19,7 +26,6 @@ const PostList = () => {
                 const filteredPosts = data.filter((post) => !existingPosts.has(post.id));
                 return [...prevPosts, ...filteredPosts];
             });
-            
             setLoading(false);
         } catch (error) {
             console.error("Error al cargar las publicaciones", error);
@@ -45,24 +51,71 @@ const PostList = () => {
         return () => window.removeEventListener("scroll", handleNext);
     }, []);
 
+    const truncateContent = (content, maxLength) => {
+        if (content.length <= maxLength) {
+            return content;
+        }
+        return content.substring(0, maxLength) + "...";
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        fetchPost(searchTitle, searchAuthor);
+    };
+
+    const filteredPosts = posts.filter((post) => {
+        return (
+            post.title.toLowerCase().includes(searchTitle.toLowerCase()) &&
+            post.user.username.toLowerCase().includes(searchAuthor.toLowerCase())
+        );
+    });
+
     return (
         <div className="container mt-5">
-            <h1 className="text-center text-primary mb-4">Publicaciones recientes</h1>
+            <h1 className="text-center mb-4">Publicaciones recientes</h1>
             <div className="row">
-                {posts.map((post) => (
-                    <div className="mb-2" key={post.id}>
-                        <div className="card">
-                            <div className="card-body">
-                                <h5 className="card-title">{post.title}</h5>
-                                <p className="card-text">{post.content}</p>
-                                <p className="card-text text-muted">Autor: {post.user.username}</p>
-                                <Link to={`/posts/${post.id}`} className="btn btn-primary">Leer más</Link>
+                <div className="col-md-8">
+                    <div className="row">
+                        {filteredPosts.map((post) => (
+                            <div className="mb-2" key={post.id}>
+                                <div className="card">
+                                    <div className="card-body">
+                                        <h5 className="card-title">{post.title}</h5>
+                                        <p className="card-text">{truncateContent(post.content, 100)}</p>
+                                        <p className="card-text text-muted">Autor: {post.user.username}</p>
+                                        <Link to={`/posts/${post.id}`} className="btn btn-primary">Leer más</Link>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+                <div className="col-md-4">
+                    <h4 className="mb-3">Buscar publicaciones</h4>
+                    <form onSubmit={handleSearch} className="mb-4">
+                        <div className="form-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Buscar por título"
+                                value={searchTitle}
+                                onChange={(e) => setSearchTitle(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Buscar por autor"
+                                value={searchAuthor}
+                                onChange={(e) => setSearchAuthor(e.target.value)}
+                            />
+                        </div>
+                        <button type="submit" className="btn btn-primary">Buscar</button>
+                    </form>
+                </div>
             </div>
-            {loaging && (
+            {loading && (
                 <div className="text-center">
                     <div className="spinner-border text-primary" role="status">
                         <span className="sr-only">Cargando...</span>
