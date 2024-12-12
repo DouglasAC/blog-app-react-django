@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
-from .models import Post
+from .models import Post, Like
 from .serializers import PostSerializer
 from .serializers import UserSerializer
 from .serializers import RegisterSerializer
@@ -141,3 +141,21 @@ class DeletePostView(APIView):
         
         post.delete()
         return Response(status=204)
+    
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response({
+                'error': 'No se encontró el post'
+            }, status=404)
+        
+        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        if not created:
+            like.delete()
+            return Response(status=204)
+        
+        return Response(status=201)
