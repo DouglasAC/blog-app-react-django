@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,3 +40,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             validated_data['password']
         )
         return user
+    
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    class Meta:
+        model = Comment
+        fields = ['id', 'user', 'content', 'created_at', 'updated_at']

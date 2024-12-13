@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import Post, Like
+from .models import Post, Like, Comment
 from .serializers import PostSerializer
 from .serializers import UserSerializer
 from .serializers import RegisterSerializer
+from .serializers import CommentSerializer
 
 # Create your views here.
 
@@ -161,4 +162,25 @@ class LikePostView(APIView):
                 'error': 'No se encontró el post'
             }, status=404)
         
+class CommentListCreateAPIView(APIView):
+
+    def get(self, request, post_id, *args, **kwargs):
+        comments = Comment.objects.filter(post=post_id)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, post_id, *agrs, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({
+                'error': 'No autorizado'
+            }, status=401)
         
+        data = request.data
+        data['user'] = request.user.id
+        data['post'] = post_id
+        serializer = CommentSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
