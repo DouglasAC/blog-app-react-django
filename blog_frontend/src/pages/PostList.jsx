@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import api from "../api";
 
 const PostList = () => {
     const [posts, setPosts] = useState([]);
@@ -13,13 +13,12 @@ const PostList = () => {
         setLoading(true);
         const accessToken = localStorage.getItem("accessToken");
         try {
-            const response = await axios.get(`http://localhost:8000/api/posts/published/`, {
+            const response = await api.get(`/posts/published/`, {
                 params: {
                     page: page,
                     title: title,
                     author: author
-                },
-                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+                }
             }
         );
             console.log("Posts", response.data);
@@ -61,12 +60,7 @@ const PostList = () => {
 
     const handleLike = async (postId) => {
         try {
-            const accessToken = localStorage.getItem("accessToken");
-            const response = await axios.post(`http://localhost:8000/api/posts/${postId}/like/`,{},{
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
+            const response = await api.post(`/posts/${postId}/like/`);
             console.log("Like", response.data);
             
             fetchPost();

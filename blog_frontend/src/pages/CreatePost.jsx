@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
@@ -14,8 +14,8 @@ const CreatePost = () => {
         const accessToken = localStorage.getItem("accessToken");
 
         try {
-            const response = await axios.post(
-                "http://localhost:8000/api/create-post/",
+            const response = await api.post(
+                "/create-post/",
                 { title, content, status },
                 {
                     headers: {

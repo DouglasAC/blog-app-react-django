@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 
 const EditPost = () => {
@@ -15,7 +15,7 @@ const EditPost = () => {
         const fetchPost = async () => {
             const accessToken = localStorage.getItem("accessToken");
             try {
-                const response = await axios.get(`http://localhost:8000/api/posts/${id}/`, {
+                const response = await api.get(`/posts/${id}/`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -36,7 +36,7 @@ const EditPost = () => {
         const accessToken = localStorage.getItem("accessToken");
 
         try{
-            await axios.put(`http://localhost:8000/api/update-post/${id}/`, 
+            await api.put(`/update-post/${id}/`, 
                 { title, content, status }, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,

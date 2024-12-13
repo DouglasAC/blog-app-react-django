@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 const PostDetail = () => {
     const { id } = useParams();
@@ -9,7 +9,7 @@ const PostDetail = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try{
-                const response = await axios.get(`http://localhost:8000/api/posts/${id}`)
+                const response = await api.get(`/posts/${id}`)
                 setPost(response.data);
                 console.log("Post", response.data);
             }catch(error){

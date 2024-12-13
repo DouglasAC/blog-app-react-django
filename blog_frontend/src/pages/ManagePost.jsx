@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import { Link } from "react-router-dom";
 
 const ManagePost = () => {
@@ -8,13 +8,8 @@ const ManagePost = () => {
 
     useEffect(() => {
         const fetchUserPosts = async () => {
-            const accessToken = localStorage.getItem("accessToken");
             try {
-                const response = await axios.get("http://localhost:8000/api/user-posts/", {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                });
+                const response = await api.get("/user-posts/");
                 setPosts(response.data);
             } catch (error) {
                 console.error("Error al obtener las publicaciones:", error);
@@ -28,15 +23,11 @@ const ManagePost = () => {
         if (!window.confirm("¿Estás seguro de eliminar la publicación?")) {
             return;
         }
-        const accessToken = localStorage.getItem("accessToken");
         try {
-            axios.delete(`http://localhost:8000/api/delete-post/${id}/`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }).then(() => {
-                setPosts(posts.filter((post) => post.id !== id));
-            });
+            api.delete(`/delete-post/${id}/`)
+                .then(() => {
+                    setPosts(posts.filter((post) => post.id !== id));
+                });
         } catch (error) {
             setError("Error al eliminar la publicación.");
             console.error("Error al eliminar la publicación:", error);
@@ -58,7 +49,7 @@ const ManagePost = () => {
                                         {post.status === 0 ? "Borrador" : "Publicado"}
                                     </p>
                                     <Link to={`/edit-post/${post.id}`} className="btn btn-warning me-2"> Editar</Link>
-                                    <button className="btn btn-danger" onClick={ () => handleDelete(post.id)} >Eliminar</button>
+                                    <button className="btn btn-danger" onClick={() => handleDelete(post.id)} >Eliminar</button>
                                 </div>
                             </div>
                         </div>

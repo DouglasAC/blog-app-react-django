@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -13,7 +13,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8000/api/token/", {
+            const response = await api.post("/token/", {
                 username,
                 password,
             });
