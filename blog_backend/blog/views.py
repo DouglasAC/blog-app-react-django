@@ -153,7 +153,7 @@ class LikePostView(APIView):
             like, created = Like.objects.get_or_create(post=post, user=request.user)
             if not created:
                 like.delete()
-                return Response({"message": "Like eliminado", "likes_count": post.like_set.count(), "liked": False},status=204)
+                return Response({"message": "Like eliminado", "likes_count": post.like_set.count(), "liked": False},status=200)
         
             return Response({"message": "Like agregado", "likes_count": post.like_set.count(), "liked": True}, status=201)
         except Post.DoesNotExist:

@@ -20,7 +20,7 @@ const PostList = () => {
                     author: author
                 }
             }
-        );
+            );
             console.log("Posts", response.data);
             const data = response.data || [];
             setPosts((prevPosts) => {
@@ -59,11 +59,21 @@ const PostList = () => {
     };
 
     const handleLike = async (postId) => {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            alert("Debes iniciar sesión para dar me gusta a una publicación.");
+            return;
+        }
         try {
             const response = await api.post(`/posts/${postId}/like/`);
             console.log("Like", response.data);
-            
-            fetchPost();
+
+            // Actualiza el estado de la publicación localmente
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post.id === postId ? { ...post, liked: response.data.liked, likes_count: response.data.likes_count } : post
+                )
+            );
         } catch (error) {
             console.error("Error al dar like a la publicación", error);
         }
