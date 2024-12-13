@@ -33,7 +33,7 @@ const CreatePost = () => {
 
     return (
         <div className="container mt-5">
-            <h1 className="text-center text-primary">Crear Publicación</h1>
+            <h1 className="text-center">Crear Publicación</h1>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
