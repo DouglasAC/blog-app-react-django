@@ -43,7 +43,7 @@ class PostListAPIView(APIView):
         return Response(serializer.errors, status=400)
     
 class PostDetailAPIView(APIView):
-    authentication_classes = []  # Permitir acceso sin autenticación
+    
     permission_classes = [] # Permitir acceso sin permisos
     def get(self, request, pk):
         post = Post.objects.get(pk=pk)
