@@ -176,11 +176,9 @@ class CommentListCreateAPIView(APIView):
             }, status=401)
         
         data = request.data
-        data['user'] = request.user.id
         data['post'] = post_id
         serializer = CommentSerializer(data=data)
-
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user) 
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)

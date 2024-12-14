@@ -14,7 +14,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_liked(self, obj):
         request = self.context.get('request', None)
-        print(request.user.username)
+        #print(request.user.username)
         if request and hasattr(request, 'user') and request.user.is_authenticated:
             return obj.liked(request.user)
         return False
@@ -45,4 +45,4 @@ class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'content', 'created_at', 'updated_at']
+        fields = ['id', 'post', 'user', 'content', 'created_at', 'updated_at']
