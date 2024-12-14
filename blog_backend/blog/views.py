@@ -4,11 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import Post, Like, Comment
+from .models import Post, Like, Comment, Category, Tag
 from .serializers import PostSerializer
 from .serializers import UserSerializer
 from .serializers import RegisterSerializer
 from .serializers import CommentSerializer
+from .serializers import CategorySerializer
+from .serializers import TagSerializer
 
 # Create your views here.
 
@@ -180,5 +182,39 @@ class CommentListCreateAPIView(APIView):
         serializer = CommentSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user) 
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    
+class CategoryListCreateAPIView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({
+                'error': 'No autorizado'
+            }, status=401)
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class TagListCreateAPIView(APIView):
+    def get(self, request):
+        tags = Tag.objects.all()
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({
+                'error': 'No autorizado'
+            }, status=401)
+        serializer = TagSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
