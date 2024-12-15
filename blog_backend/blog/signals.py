@@ -11,7 +11,10 @@ DEFAULT_CATEGORIES = [
     "Negocios",
     "Educación",
     "Deportes",
-    "Noticias"
+    "Noticias",
+    "Naturaleza",
+    "Animales",
+    "Entretenimiento"
 ]
 
 @receiver(post_migrate)
@@ -36,7 +39,7 @@ DEFAULT_TAGS = [
     "Decoración",
     "Aprendizaje",
     "Métodos de Estudio",
-    "Cursos"
+    "Cursos",
     "Marketing",
     "Finanzas",
     "Fútbol",
@@ -47,7 +50,16 @@ DEFAULT_TAGS = [
     "Inpiración",
     "Noticias del Mundo",
     "Historias cortas",
-    "Cuentos"
+    "Cuentos",
+    "Mascotas",
+    "Animales Salvajes",
+    "Humor",
+    "Curiosidades",
+    "Juegos",
+    "Películas",
+    "Series",
+    "Libros",
+    "Cómics",
 ]
 
 @receiver(post_migrate)

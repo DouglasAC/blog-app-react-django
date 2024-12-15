@@ -10,6 +10,10 @@ const EditPost = () => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("1");
+    const [selectedTags, setSelectedTags] = useState([]);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -20,14 +24,30 @@ const EditPost = () => {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
-                const { title, content, status } = response.data;
+                const { title, content, status, category, tags } = response.data;
                 setTitle(title);
                 setContent(content);
                 setStatus(status);
+                setSelectedCategory(category.id.toString());
+                setSelectedTags(tags.map((tag) => tag.id.toString()));
             } catch (error) {
                 console.error("Error al obtener la publicación:", error);
             }
         };
+
+        const fetchCategoriesAndTags = async () => {
+            try {
+                const categoriesResponse = await api.get("/categories/");
+                const tagsResponse = await api.get("/tags/");
+                setCategories(categoriesResponse.data);
+                setTags(tagsResponse.data);
+            } catch (error) {
+                console.error("Error al cargar las categorías y etiquetas", error);
+            }
+        };
+
+        
+        fetchCategoriesAndTags();
         fetchPost();
     }, [id]);
 
@@ -37,7 +57,13 @@ const EditPost = () => {
 
         try{
             await api.put(`/update-post/${id}/`, 
-                { title, content, status }, {
+                { 
+                    title, 
+                    content, 
+                    status,
+                    category_id: selectedCategory,
+                    tag_ids: selectedTags
+                 }, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -49,6 +75,15 @@ const EditPost = () => {
             console.error("Error al actualizar la publicación:", error);
             setError("Error al actualizar la publicación.");
         }
+    };
+
+    const handleTagChange = (e) => {
+        const value = e.target.value;
+        setSelectedTags((prevSelectedTags) =>
+            prevSelectedTags.includes(value)
+                ? prevSelectedTags.filter((tag) => tag !== value)
+                : [...prevSelectedTags, value]
+        );
     };
 
     return (
@@ -78,6 +113,41 @@ const EditPost = () => {
                         onChange={(e) => setContent(e.target.value)}
                         required
                     ></textarea>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="category" className="form-label">Categoría</label>
+                    <select
+                        className="form-select"
+                        id="category"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="tags" className="form-label">Etiquetas</label>
+                    <div className="row">
+                        {tags.map((tag) => (
+                            <div className="col-md-3" key={tag.id}>
+                                <div className="form-check">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        value={tag.id.toString()}
+                                        id={`tag-${tag.id}`}
+                                        checked={selectedTags.includes(tag.id.toString())}
+                                        onChange={handleTagChange}
+                                    />
+                                    <label className="form-check-label" htmlFor={`tag-${tag.id}`}>
+                                        {tag.name}
+                                    </label>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="status" className="form-label">Estado</label>
