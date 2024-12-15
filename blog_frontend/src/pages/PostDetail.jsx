@@ -113,6 +113,10 @@ const PostDetail = () => {
                             <p className="card-text text-muted">Publicado por {post.user.username} el {new Date(post.created_at).toLocaleDateString()} | Me gustas: {post.likes_count}</p>
                             <hr />
                             <p className="card-text">{post.content}</p>
+                            <hr />
+                            <p><strong>Categoría: </strong>{post.category ? post.category.name : "Ninguna"}</p>
+                            <p><strong>Etiquetas: </strong>{post.tags.length > 0 ? post.tags.map(tag => <span key={tag.id} className="badge bg-secondary me-1">{tag.name}</span>) : "Ninguna"}</p>
+                    
                             <button className={`btn ${post.liked ? 'btn-success' : 'btn-secondary'} me-2`} onClick={() => handleLike(post.id)}>{post.liked ? 'Te gusta' : 'Me gusta'}</button>
                             <Link to="/posts" className="btn btn-primary ">Volver</Link>
                         </>
@@ -123,8 +127,8 @@ const PostDetail = () => {
                 </div>
 
             </div>
-            <div>
-                <h2 className="mt-4">Comentarios</h2>
+            <div div className="mt-5">
+                <h2>Comentarios</h2>
                 <CommentForm onCommentAdded={(newComment) => setComments((prev) => [newComment, ...prev])} />
                 {comments.length > 0 ? (
                     comments.map((comment) => (
