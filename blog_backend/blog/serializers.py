@@ -23,6 +23,8 @@ class PostSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), source = 'category',write_only=True)
+    tag_ids = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, source='tags', write_only=True)
 
     def get_liked(self, obj):
         request = self.context.get('request', None)
@@ -33,10 +35,10 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_likes_count(self, obj):
         return obj.likes_count()
-    
+     
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'user', 'status', 'likes_count', 'liked', 'category', 'tags']
+        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'user', 'status', 'category', 'tags', 'likes_count', 'liked', 'category_id', 'tag_ids']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

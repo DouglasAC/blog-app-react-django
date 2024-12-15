@@ -70,7 +70,7 @@ class PostPublishAPIView(APIView):
     permission_classes = [] # Permitir acceso sin autenticación
 
     def get(self, request, *args, **kwargs):
-        print(f"Usuario autenticado: {request.user}")
+        #print(f"Usuario autenticado: {request.user}")
         title = request.query_params.get('title', None)
         author = request.query_params.get('author', None)
         post = Post.objects.filter(status=1).order_by('-created_at')
@@ -80,7 +80,7 @@ class PostPublishAPIView(APIView):
             post = post.filter(user__username=author)
         paginator = CustomPagination()
         paginated_posts = paginator.paginate_queryset(post, request)
-        print(request.user)
+        #print(request.user)
         serealizer = PostSerializer(paginated_posts, many=True, context={'request': request})
         return Response(serealizer.data)
     
@@ -101,9 +101,12 @@ class CreatePostView(APIView):
     def post(self, request):
         data = request.data
         data['user'] = request.user.id
-        
+        print("Data: ", data)
         serializer = PostSerializer(data=data,context={'request': request})
+        print("Serializer data: ", serializer.initial_data)
+        
         if serializer.is_valid():
+            print("Serializer is valid: ", serializer.validated_data)
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)

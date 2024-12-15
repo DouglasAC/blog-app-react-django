@@ -45,7 +45,7 @@ DEFAULT_TAGS = [
     "Espacio Exterior",
     "Medio Ambiente",
     "Inpiración",
-    "Noticias del Mundo"
+    "Noticias del Mundo",
     "Historias cortas",
     "Cuentos"
 ]

@@ -39,7 +39,7 @@ class Post(models.Model):
         return self.like_set.count()
     
     def liked(self, user):
-        print(user)
+        #print(user)
         return self.like_set.filter(user=user).exists()
     
 class Like(models.Model):

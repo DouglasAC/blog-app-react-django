@@ -103,9 +103,11 @@ const PostList = () => {
                             <div className="mb-2" key={post.id}>
                                 <div className="card">
                                     <div className="card-body">
-                                        <h5 className="card-title">{post.title}</h5>
+                                        <h5 className="card-title"><strong>{post.title}</strong></h5>
                                         <p className="card-text">{truncateContent(post.content, 100)}</p>
                                         <p className="card-text text-muted">Autor: {post.user.username} | Me gustas: {post.likes_count}</p>
+                                        <p><strong>Categoria: </strong>{post.category ? <span className="badge rounded-pill text-bg-info">{post.category.name}</span> : "Ninguna"}</p>
+                                        <p><strong>Etiquetas: </strong>{post.tags.length > 0 ? post.tags.map(tag => <span key={tag.id} className="badge rounded-pill text-bg-secondary mr-1">{tag.name}</span>) : "Ninguna"}</p>
                                         <button className={`btn ${post.liked ? 'btn-success' : 'btn-secondary'} me-2`} onClick={() => handleLike(post.id)}>{post.liked ? 'Te gusta' : 'Me gusta'}</button>
                                         <Link to={`/posts/${post.id}`} className="btn btn-primary ml-2">Leer más</Link>
                                     </div>
