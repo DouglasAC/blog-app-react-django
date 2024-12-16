@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import markdown
 
 # Create your models here.
 STATUS = ( (0, "Borrador"), (1, "Publicado"))
@@ -25,6 +26,7 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
+    content_html = models.TextField(editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -41,6 +43,26 @@ class Post(models.Model):
     def liked(self, user):
         #print(user)
         return self.like_set.filter(user=user).exists()
+    
+    def save(self, *args, **kwargs):
+        self.content_html = markdown.markdown(self.content, extensions=[
+            'markdown.extensions.tables',
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.codehilite',
+            'markdown.extensions.toc',
+            'markdown.extensions.extra',
+            'markdown.extensions.admonition',
+            'markdown.extensions.nl2br',
+            'markdown.extensions.smarty',
+            'markdown.extensions.meta',
+            'markdown.extensions.sane_lists',
+            'markdown.extensions.wikilinks',
+            'markdown.extensions.footnotes',
+            'markdown.extensions.attr_list',
+            'markdown.extensions.def_list', 
+            'markdown.extensions.abbr',
+        ])
+        super(Post, self).save(*args, **kwargs)
     
 class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../api";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github.css";
+import Markdown from "react-markdown";
 
 const PostDetail = () => {
     const { id } = useParams();
@@ -112,7 +117,7 @@ const PostDetail = () => {
                             <h1 className="card-title">{post.title}</h1>
                             <p className="card-text text-muted">Publicado por {post.user.username} el {new Date(post.created_at).toLocaleDateString()} | Me gustas: {post.likes_count}</p>
                             <hr />
-                            <p className="card-text">{post.content}</p>
+                            <div dangerouslySetInnerHTML={{ __html: post.content_html }} /> 
                             <hr />
                             <p><strong>Categoría: </strong>{post.category ? post.category.name : "Ninguna"}</p>
                             <p><strong>Etiquetas: </strong>{post.tags.length > 0 ? post.tags.map(tag => <span key={tag.id} className="badge bg-secondary me-1">{tag.name}</span>) : "Ninguna"}</p>

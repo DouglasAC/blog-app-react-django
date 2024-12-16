@@ -9,3 +9,11 @@
 .spinner-border {
   margin-top: 20px;
 }
+
+.highlight {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: 10px;
+  overflow: auto;
+  font-size: 0.9em;
+}

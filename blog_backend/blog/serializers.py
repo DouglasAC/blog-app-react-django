@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Post, Comment, Category, Tag
 from django.contrib.auth.models import User
+import markdown
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,10 +36,10 @@ class PostSerializer(serializers.ModelSerializer):
     
     def get_likes_count(self, obj):
         return obj.likes_count()
-     
+        
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_at', 'updated_at', 'user', 'status', 'category', 'tags', 'likes_count', 'liked', 'category_id', 'tag_ids']
+        fields = ['id', 'title', 'content', 'content_html', 'created_at', 'updated_at', 'user', 'status', 'category', 'tags', 'likes_count', 'liked', 'category_id', 'tag_ids']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
