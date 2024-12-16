@@ -4,8 +4,11 @@ import api from "../api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github.css";
-import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+
+import 'github-markdown-css/github-markdown-light.css';
+
+
 
 const PostDetail = () => {
     const { id } = useParams();
@@ -117,11 +120,17 @@ const PostDetail = () => {
                             <h1 className="card-title">{post.title}</h1>
                             <p className="card-text text-muted">Publicado por {post.user.username} el {new Date(post.created_at).toLocaleDateString()} | Me gustas: {post.likes_count}</p>
                             <hr />
-                            <div dangerouslySetInnerHTML={{ __html: post.content_html }} /> 
+                            <div className="markdown-body">
+                                <ReactMarkdown
+                                    children={post.content}
+                                    remarkPlugins={[remarkGfm]}
+                                    rehypePlugins={[rehypeRaw, rehypeHighlight]}
+                                />
+                            </div>
                             <hr />
                             <p><strong>Categoría: </strong>{post.category ? post.category.name : "Ninguna"}</p>
                             <p><strong>Etiquetas: </strong>{post.tags.length > 0 ? post.tags.map(tag => <span key={tag.id} className="badge bg-secondary me-1">{tag.name}</span>) : "Ninguna"}</p>
-                    
+
                             <button className={`btn ${post.liked ? 'btn-success' : 'btn-secondary'} me-2`} onClick={() => handleLike(post.id)}>{post.liked ? 'Te gusta' : 'Me gusta'}</button>
                             <Link to="/posts" className="btn btn-primary ">Volver</Link>
                         </>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { use } from "react";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 const CreatePost = () => {
     const [title, setTitle] = useState("");
@@ -78,14 +80,11 @@ const CreatePost = () => {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="content" className="form-label">Contenido</label>
-                    <textarea
-                        className="form-control"
-                        id="content"
-                        rows="5"
+                    <SimpleMDE
                         value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        required
-                    ></textarea>
+                        onChange={(value) => setContent(value)}>   
+                        </SimpleMDE>
+                    
                 </div>
                 <div className="mb-3">
                     <label htmlFor="category" className="form-label">Categoría</label>
