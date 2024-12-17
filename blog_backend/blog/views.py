@@ -11,6 +11,7 @@ from .serializers import RegisterSerializer
 from .serializers import CommentSerializer
 from .serializers import CategorySerializer
 from .serializers import TagSerializer
+from django.db.models import Count
 
 # Create your views here.
 
@@ -32,6 +33,14 @@ class CustomPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'has_more': self.page.has_next(),
+            'results': data
+        })
+
 class PostListAPIView(APIView):
     def get(self, request):
         posts = Post.objects.all()
@@ -48,6 +57,10 @@ class PostListAPIView(APIView):
 class PostDetailAPIView(APIView):
     
     permission_classes = [] # Permitir acceso sin permisos
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    pagination_class = CustomPagination
+
     def get(self, request, pk):
         post = Post.objects.get(pk=pk)
         serializer = PostSerializer(post, context={'request': request})
@@ -73,16 +86,37 @@ class PostPublishAPIView(APIView):
         #print(f"Usuario autenticado: {request.user}")
         title = request.query_params.get('title', None)
         author = request.query_params.get('author', None)
-        post = Post.objects.filter(status=1).order_by('-created_at')
+        category = request.query_params.get('category', None)
+        tags = request.query_params.getlist('tags[]', None)
+        date = request.query_params.get('date', None)
+        sortby = request.query_params.get('sortBy', None)
+        post = Post.objects.filter(status=1)
         if title:
             post = post.filter(title__icontains=title)
         if author:
             post = post.filter(user__username=author)
+        if category:
+            post = post.filter(category__id=category)
+        if tags:
+            post = post.filter(tags__id__in=tags).distinct()
+        if date:
+            post = post.filter(created_at__date=date)
+        if sortby:
+            print("sortby: ", sortby)
+            if sortby == 'popular':
+                post = post.annotate(like_count=Count('like')).order_by('-like_count')
+            elif sortby == 'recent':
+                post = post.order_by('-created_at')
+            elif sortby == 'oldest':
+                post = post.order_by('created_at')
+        else:
+            post = post.order_by('-created_at')
+        print("post len: ",len(post))
         paginator = CustomPagination()
         paginated_posts = paginator.paginate_queryset(post, request)
         #print(request.user)
         serealizer = PostSerializer(paginated_posts, many=True, context={'request': request})
-        return Response(serealizer.data)
+        return paginator.get_paginated_response(serealizer.data)
     
 class RegisterView(APIView):
     authentication_classes = []  # Permitir acceso sin autenticación

@@ -6,28 +6,61 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [searchTitle, setSearchTitle] = useState("");
     const [searchAuthor, setSearchAuthor] = useState("");
+    const [searchCategory, setSearchCategory] = useState("");
+    const [searchTags, setSearchTags] = useState([]);
+    const [searchDate, setSearchDate] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [sortBy, setSortBy] = useState("");
 
-    const fetchPost = async (title = "", author = "") => {
+
+    useEffect(() => {
+        const fetchCategoriesAndTags = async () => {
+            try {
+                const categoriesResponse = await api.get("/categories/");
+                const tagsResponse = await api.get("/tags/");
+                setCategories(categoriesResponse.data);
+                setTags(tagsResponse.data);
+            } catch (error) {
+                console.error("Error al cargar las categorías y etiquetas", error);
+            }
+        };
+
+
+        fetchCategoriesAndTags();
+    }, []);
+
+    useEffect(() => {
+        fetchPost();
+    }, [page, searchCategory, searchTags]);
+
+
+    const fetchPost = async () => {
         setLoading(true);
-        const accessToken = localStorage.getItem("accessToken");
         try {
             const response = await api.get(`/posts/published/`, {
                 params: {
                     page: page,
-                    title: title,
-                    author: author
+                    title: searchTitle,
+                    author: searchAuthor,
+                    category: searchCategory,
+                    tags: searchTags,
+                    date: searchDate,
+                    sortBy: sortBy
                 }
             }
             );
-            console.log("Posts", response.data);
-            const data = response.data || [];
+            console.log("Posts", response);
+            const data = response.data.results || [];
             setPosts((prevPosts) => {
                 const existingPosts = new Set(prevPosts.map((post) => post.id));
                 const filteredPosts = data.filter((post) => !existingPosts.has(post.id));
                 return [...prevPosts, ...filteredPosts];
             });
+            setHasMore(response.data.has_more); // Verifica si hay más páginas
             setLoading(false);
         } catch (error) {
             console.error("Error al cargar las publicaciones", error);
@@ -35,28 +68,18 @@ const PostList = () => {
         }
     };
 
-    useEffect(() => {
-        fetchPost();
-    }, [page]);
-
-    const handleNext = () => {
-        if (
-            window.innerHeight + document.documentElement.scrollTop >=
-            document.documentElement.offsetHeight - 10
-        ) {
-            setPage((prevPage) => prevPage + 1);
-        }
-    };
-
-    useEffect(() => {
-        window.addEventListener("scroll", handleNext);
-        return () => window.removeEventListener("scroll", handleNext);
-    }, []);
-
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchPost(searchTitle, searchAuthor);
+        setPage(1);
+        setPosts([]);
+        fetchPost();
+    }
+
+
+    const handleLoadMore = () => {
+        setPage((prevPage) => prevPage + 1);
     };
+
 
     const handleLike = async (postId) => {
         const accessToken = localStorage.getItem("accessToken");
@@ -99,8 +122,8 @@ const PostList = () => {
             <div className="row">
                 <div className="col-md-8">
                     <div className="row">
-                        {filteredPosts.map((post) => (
-                            <div className="mb-2" key={post.id}>
+                        {posts.length > 0 ? ( posts.map((post) => (
+                            <div className="mb-2" key={"post-" + post.id}>
                                 <div className="card">
                                     <div className="card-body">
                                         <h5 className="card-title"><strong>{post.title}</strong></h5>
@@ -113,7 +136,10 @@ const PostList = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        ))
+                        ) : (
+                            <p className="text-center">No hay publicaciones</p>
+                        )}
                     </div>
                 </div>
                 <div className="col-md-4">
@@ -137,6 +163,56 @@ const PostList = () => {
                                 onChange={(e) => setSearchAuthor(e.target.value)}
                             />
                         </div>
+                        <div className="form-group mb-3">
+                            <select
+                                className="form-select"
+                                value={searchCategory}
+                                onChange={(e) => setSearchCategory(e.target.value)}
+                            >
+                                <option value="">Selecciona una categoría</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group mb-3">
+                            <select
+                                className="form-select"
+                                value={searchTags}
+                                onChange={(e) => {
+                                    const options = Array.from(e.target.options);
+                                    const selected = options.filter(option => option.selected).map(option => option.value);
+                                    setSearchTags(selected);
+                                    console.log("Selected tags", selected);
+                                }}
+                                multiple={true}
+                            >
+                                {tags.map((tag) => (
+                                    <option key={tag.id} value={tag.id}>{tag.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group mb-3">
+                            <input
+                                type="date"
+                                className="form-control"
+                                value={searchDate}
+                                onChange={(e) => setSearchDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <select
+                                className="form-control"
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                            >
+                                <option value="">Ordenar por</option>
+                                <option value="popular">Popularidad</option>
+                                <option value="recent">Reciente</option>
+                                <option value="oldest">Antiguo</option>
+                            </select>
+                        </div>
+
                         <button type="submit" className="btn btn-primary">Buscar</button>
                     </form>
                 </div>
@@ -148,6 +224,12 @@ const PostList = () => {
                     </div>
                 </div>
             )}
+            {hasMore && !loading && (
+                <div className="d-flex justify-content-center mt-4">
+                    <button className="btn btn-primary" onClick={handleLoadMore}>Cargar más</button>
+                </div>
+            )}
+
         </div>
     );
 };
