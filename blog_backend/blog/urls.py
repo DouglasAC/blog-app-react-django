@@ -15,5 +15,6 @@ urlpatterns = [
     path('api/posts/<int:post_id>/comments/', views.CommentListCreateAPIView.as_view(), name='post-comments'),
     path('api/categories/', views.CategoryListCreateAPIView.as_view(), name='category-list'),
     path('api/tags/', views.TagListCreateAPIView.as_view(), name='tag-list'),
+    path('api/user-statistics/', views.UserStatisticsAPIView.as_view(), name='user-statistics'),
     
 ]

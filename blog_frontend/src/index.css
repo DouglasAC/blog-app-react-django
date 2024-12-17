@@ -17,3 +17,14 @@
   overflow: auto;
   font-size: 0.9em;
 }
+
+.navbar {
+  position: fixed;
+  top: 0; /* Fija la barra en la parte superior */
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  z-index: 1000; /* Mantiene la barra sobre otros elementos */
+
+}
+body {
+  padding-top: 60px; /* Desplaza el contenido para evitar que quede oculto detrás del navbar */
+}

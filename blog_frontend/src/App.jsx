@@ -9,6 +9,7 @@ import Navbar from "./components/NavBarr";
 import CreatePost from "./pages/CreatePost";
 import EditPost from "./pages/EditPost";
 import ManagePost from "./pages/ManagePost";
+import UserStatistics from "./pages/UserStatistics";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/create-post" element={<CreatePost />} />
         <Route path="/edit-post/:id" element={<EditPost />} />
         <Route path="/manage-posts" element={<ManagePost />} />
+        <Route path="/user-statistics" element={<UserStatistics />} />
       </Routes>
     </Router>
   );

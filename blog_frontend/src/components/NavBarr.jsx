@@ -55,6 +55,11 @@ const Navbar = () => {
                                         Gestionar Publicaciones
                                     </Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/user-statistics">
+                                        Estadísticas
+                                    </Link>
+                                </li>
                             </>
                         )}
                         {isAuthenticated ? (

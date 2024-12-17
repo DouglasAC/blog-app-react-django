@@ -11,7 +11,7 @@ from .serializers import RegisterSerializer
 from .serializers import CommentSerializer
 from .serializers import CategorySerializer
 from .serializers import TagSerializer
-from django.db.models import Count
+from django.db.models import Count, Sum
 
 # Create your views here.
 
@@ -258,3 +258,34 @@ class TagListCreateAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+
+class UserStatisticsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        # Número total de publicaciones
+        total_posts = user.post_set.filter(status=1).count()
+        # Numeto total de borradores
+        total_drafts = user.post_set.filter(status=0).count()
+        # Top 3 categorías más utilizadas
+        top_categories = user.post_set.filter(status=1).values('category__name').annotate(count=Count('category')).order_by('-count')[:3]
+        # Top 3 etiquetas más utilizadas
+        top_tags = user.post_set.filter(status=1).values('tags__name').annotate(count=Count('tags')).order_by('-count')[:3]
+        # Número total de likes
+        total_likes = user.post_set.filter(status=1).aggregate(total_likes=Count('like'))['total_likes']
+        # Número total de comentarios recibidos
+        total_comments = user.post_set.filter(status=1).aggregate(total_comments=Count('comments'))['total_comments']
+        # Publicaciones más gustadas
+        posts = Post.objects.filter(status=1, user=user).annotate(likes_count=Count('like', distinct=True),comments_count=Count('comments', distinct=True)).values('id', 'title', 'likes_count', 'comments_count').order_by("-likes_count")[:3]
+       
+        return Response({
+            'total_posts': total_posts,
+            'total_drafts': total_drafts,
+            'most_liked_posts': posts if posts else None,
+            'top_category': top_categories if top_categories else None,
+            'top_tags': top_tags if top_tags else None,
+            'total_likes': total_likes,
+            'total_comments': total_comments
+        })
