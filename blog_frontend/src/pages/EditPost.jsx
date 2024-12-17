@@ -3,6 +3,7 @@ import api from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
+import { Toast } from 'bootstrap';
 
 const EditPost = () => {
     const { id } = useParams();
@@ -48,7 +49,7 @@ const EditPost = () => {
             }
         };
 
-        
+
         fetchCategoriesAndTags();
         fetchPost();
     }, [id]);
@@ -57,25 +58,30 @@ const EditPost = () => {
         e.preventDefault();
         const accessToken = localStorage.getItem("accessToken");
 
-        try{
-            await api.put(`/update-post/${id}/`, 
-                { 
-                    title, 
-                    content, 
+        try {
+            await api.put(`/update-post/${id}/`,
+                {
+                    title,
+                    content,
                     status,
                     category_id: selectedCategory,
                     tag_ids: selectedTags
-                 }, {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
+                }, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
             );
             //navigate("/posts");
             setSuccess("Publicación actualizada con éxito.");
+            setError("");
+            handleToast();
+
         } catch (error) {
             console.error("Error al actualizar la publicación:", error);
             setError("Error al actualizar la publicación.");
+            setSuccess("");
+            handleToastError();
         }
     };
 
@@ -88,11 +94,43 @@ const EditPost = () => {
         );
     };
 
+    const handleToast = () => {
+        var myToast = Toast.getOrCreateInstance(document.getElementById('toastSuccess'));
+        myToast.show();
+    };
+
+    const handleToastError = () => {
+        var myToast = Toast.getOrCreateInstance(document.getElementById('toastError'));
+        myToast.show();
+    };
+
     return (
         <div className="container mt-5">
             <h1 className="text-center">Editar Publicación</h1>
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div className="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true" id="toastSuccess">
+                    <div className="toast-header">
+                        <strong className="me-auto">Editar Publicación</strong>
+                        <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div className="toast-body">
+                        Publicación actualizada con éxito.
+                    </div>
+                </div>
+            </div>
+            <div className="toast-container position-fixed bottom-0 end-0 p-3">
+                <div className="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" id="toastError">
+                    <div className="toast-header">
+                        <strong className="me-auto">Editar Publicación</strong>
+                        <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div className="toast-body">
+                        Error al actualizar la publicación.
+                    </div>
+                </div>    
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="title" className="form-label">Título</label>
@@ -109,8 +147,8 @@ const EditPost = () => {
                     <label htmlFor="content" className="form-label">Contenido</label>
                     <SimpleMDE
                         value={content}
-                        onChange={(value) => setContent(value)}>   
-                        </SimpleMDE>
+                        onChange={(value) => setContent(value)}>
+                    </SimpleMDE>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="category" className="form-label">Categoría</label>
