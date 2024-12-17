@@ -52,7 +52,7 @@ Este proyecto es una **aplicación de blog interactiva** desarrollada con **Reac
 
 ### Clonar el repositorio
 ```bash
-https://github.com/tu-usuario/tu-repositorio.git
+https://github.com/DouglasAC/blog-app-react-django.git
 cd tu-repositorio
 ```
 
