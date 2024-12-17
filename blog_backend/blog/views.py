@@ -90,6 +90,7 @@ class PostPublishAPIView(APIView):
         tags = request.query_params.getlist('tags[]', None)
         date = request.query_params.get('date', None)
         sortby = request.query_params.get('sortBy', None)
+        limit = request.query_params.get('limit', None)
         post = Post.objects.filter(status=1)
         if title:
             post = post.filter(title__icontains=title)
@@ -111,6 +112,8 @@ class PostPublishAPIView(APIView):
                 post = post.order_by('created_at')
         else:
             post = post.order_by('-created_at')
+        if limit:
+            post = post[:int(limit)]
         print("post len: ",len(post))
         paginator = CustomPagination()
         paginated_posts = paginator.paginate_queryset(post, request)
